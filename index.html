@@ -3,512 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון אחוזוני עצמות ארוכות בעובר - Chitty & Altman (2002)</title>
-    <!-- Tailwind CSS -->
+    <title>מחשבון אחוזוני עצמות ארוכות בעובר - Chitty et al.</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Assistant & Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        clinical: {
-                            blue: '#B3CDE3',
-                            blueDark: '#5A89B0',
-                            green: '#CCEBC5',
-                            greenDark: '#4D8B40',
-                            purple: '#DECBE4',
-                            purpleDark: '#825B8E',
-                            bg: '#F8F9FA',
-                            card: '#FFFFFF',
-                            text: '#2D3748'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Assistant', 'Inter', 'sans-serif'],
-                        mono: ['Inter', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #F8F9FA;
-            color: #2D3748;
-            font-family: 'Assistant', 'Inter', sans-serif;
-        }
-        .pastel-gradient {
-            background: linear-gradient(135deg, #B3CDE3 0%, #DECBE4 50%, #CCEBC5 100%);
-        }
-        .card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(45, 55, 72, 0.06), 0 8px 10px -6px rgba(45, 55, 72, 0.04);
-        }
-        /* Custom Gauge Marker Transition */
-        #gaugeMarker {
-            transition: right 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        /* Number input arrows removal for cleaner look */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            opacity: 1;
-        }
+        body { font-family: 'Assistant', sans-serif; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#B3CDE3] selection:text-[#2D3748]">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
-        <div class="h-2 w-full pastel-gradient"></div>
-        <div class="max-w-3xl mx-auto px-4 py-4 md:py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div class="text-center sm:text-right">
-                <h1 class="text-xl md:text-2xl font-extrabold text-[#2D3748] tracking-tight flex items-center justify-center sm:justify-start gap-2">
-                    <svg class="w-6 h-6 text-[#5A89B0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    <span>מחשבון אחוזוני עצמות ארוכות בעובר</span>
-                </h1>
-                <p class="text-xs md:text-sm text-slate-500 mt-0.5">
-                    מבוסס על עקומות הגדילה של Chitty & Altman (BJOG 2002; 109: 919–929)
-                </p>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#B3CDE3]/40 text-[#2D3748] border border-[#B3CDE3]">
-                    ISUOG / Chitty Reference
-                </span>
-            </div>
+    <header class="bg-indigo-700 text-white shadow-md py-6 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <h1 class="text-2xl md:text-3xl font-bold">מחשבון אחוזוני עצמות ארוכות בעובר</h1>
+            <p class="text-indigo-200 mt-1 text-sm md:text-base">מבוסס על המחקר הקלאסי של Chitty & Altman (BJOG 2002)</p>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-3xl w-full mx-auto px-4 py-6 md:py-8 flex-grow space-y-6">
-        
-        <!-- Input Card -->
-        <section class="bg-white rounded-2xl card-shadow border border-slate-200/80 p-5 md:p-7">
-            <form id="calcForm" class="space-y-5" novalidate>
-                
-                <!-- Bone Selection -->
-                <div>
-                    <label for="boneType" class="block text-sm font-bold text-[#2D3748] mb-2">
-                        1. בחירת העצם הנמדדת (Limb Bone):
-                    </label>
-                    <div class="relative">
-                        <select id="boneType" class="w-full appearance-none bg-[#F8F9FA] hover:bg-white border-2 border-[#B3CDE3] focus:border-[#5A89B0] rounded-xl px-4 py-3 text-base font-semibold text-[#2D3748] focus:outline-none focus:ring-4 focus:ring-[#B3CDE3]/40 transition cursor-pointer">
-                            <option value="femur">עצם הירך (Femur)</option>
-                            <option value="humerus">עצם הזרוע (Humerus)</option>
-                            <option value="tibia">עצם השוקה (Tibia)</option>
-                            <option value="fibula">עצם השוקית (Fibula)</option>
-                            <option value="radius">עצם החישור (Radius)</option>
-                            <option value="ulna">עצם הגומד (Ulna)</option>
-                            <option value="foot">אורך כף הרגל (Foot)</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-slate-600">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gestational Age (Weeks + Days) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="weeks" class="block text-sm font-bold text-[#2D3748] mb-2">
-                            2. שבוע הריון (12–42):
-                        </label>
-                        <div class="relative">
-                            <select id="weeks" class="w-full appearance-none bg-[#F8F9FA] hover:bg-white border-2 border-[#B3CDE3] focus:border-[#5A89B0] rounded-xl px-4 py-3 text-base font-semibold text-[#2D3748] focus:outline-none focus:ring-4 focus:ring-[#B3CDE3]/40 transition cursor-pointer">
-                                <!-- Populated dynamically from 12 to 42 -->
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-slate-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="days" class="block text-sm font-bold text-[#2D3748] mb-2">
-                            3. ימים נוספים (0–6):
-                        </label>
-                        <div class="relative">
-                            <select id="days" class="w-full appearance-none bg-[#F8F9FA] hover:bg-white border-2 border-[#B3CDE3] focus:border-[#5A89B0] rounded-xl px-4 py-3 text-base font-semibold text-[#2D3748] focus:outline-none focus:ring-4 focus:ring-[#B3CDE3]/40 transition cursor-pointer">
-                                <option value="0">+ 0 ימים</option>
-                                <option value="1">+ יום 1</option>
-                                <option value="2">+ 2 ימים</option>
-                                <option value="3">+ 3 ימים</option>
-                                <option value="4">+ 4 ימים</option>
-                                <option value="5">+ 5 ימים</option>
-                                <option value="6">+ 6 ימים</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center px-4 text-slate-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Measured Length in mm -->
-                <div>
-                    <label for="measuredLength" class="block text-sm font-bold text-[#2D3748] mb-2">
-                        4. אורך נמדד במילימטרים (mm):
-                    </label>
-                    <div class="relative">
-                        <input type="number" step="0.1" min="0.1" max="150" id="measuredLength" placeholder="הזן מדידה (למשל: 32.5)" required
-                            class="w-full bg-[#F8F9FA] focus:bg-white border-2 border-[#B3CDE3] focus:border-[#5A89B0] rounded-xl px-4 py-3 text-lg font-bold text-[#2D3748] placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#B3CDE3]/40 transition"
-                            dir="ltr" style="text-align: right;">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-sm font-bold text-slate-500">
-                            mm
-                        </span>
-                    </div>
-                    <!-- Validation Message Box (No alert()) -->
-                    <div id="errorBox" class="hidden mt-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span id="errorText">נא להזין ערך מספרי חיובי תקין במילימטרים.</span>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="pt-2 flex flex-col sm:flex-row gap-3">
-                    <button type="submit" class="w-full sm:flex-1 bg-[#2D3748] hover:bg-slate-700 active:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
-                        <svg class="w-5 h-5 text-[#B3CDE3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                        <span>חשב אחוזון וציון תקן</span>
-                    </button>
-                    <button type="button" id="resetBtn" class="sm:w-auto bg-[#F8F9FA] hover:bg-slate-200 text-[#2D3748] font-semibold py-3.5 px-5 rounded-xl border border-slate-300 transition duration-200 text-sm">
-                        נקה שדות
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Results Section -->
-        <section id="resultsSection" class="bg-white rounded-2xl card-shadow border border-slate-200/80 p-5 md:p-7 space-y-6">
+    <!-- Main Content -->
+    <main class="max-w-2xl w-full mx-auto px-4 py-8 flex-grow">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100">
             
-            <!-- Result Header & Clinical Copy Button -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <form id="calcForm" class="space-y-6">
+                <!-- Bone Type Selection -->
                 <div>
-                    <h2 class="text-lg md:text-xl font-extrabold text-[#2D3748]" id="resultTitle">
-                        ערכי ייחוס ותוצאות חישוב
-                    </h2>
-                    <p class="text-xs md:text-sm text-slate-500" id="resultSubtitle">
-                        בחר שבוע הריון והזן מדידה לקבלת חישוב מדויק
-                    </p>
+                    <label for="boneType" class="block text-sm font-semibold text-slate-700 mb-2">בחר עצם נבדקת:</label>
+                    <select id="boneType" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                        <option value="femur">עצם הירך (Femur)</option>
+                        <option value="humerus">עצם הזרוע (Humerus)</option>
+                        <option value="tibia">שוקה (Tibia)</option>
+                        <option value="fibula">שוקית (Fibula)</option>
+                        <option value="radius">רדיוס - עצם האמה (Radius)</option>
+                        <option value="ulna">אולנה - עצם האמה (Ulna)</option>
+                        <option value="foot">כף הרגל (Foot)</option>
+                    </select>
                 </div>
-                <button type="button" id="copyBtn" class="hidden self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#DECBE4]/40 hover:bg-[#DECBE4]/70 text-[#2D3748] border border-[#DECBE4] font-semibold text-sm transition">
-                    <svg class="w-4 h-4 text-[#825B8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                    </svg>
-                    <span id="copyBtnText">העתק סיכום לתיק רפואי</span>
+
+                <!-- Gestational Age: Weeks & Days -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="weeks" class="block text-sm font-semibold text-slate-700 mb-2">שבוע הריון מלא:</label>
+                        <select id="weeks" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                            <!-- Populated dynamically via JS from 12 to 42 -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="days" class="block text-sm font-semibold text-slate-700 mb-2">ימים נוספים (0-6):</label>
+                        <select id="days" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                            <option value="0">0 ימים</option>
+                            <option value="1">יום 1</option>
+                            <option value="2">2 ימים</option>
+                            <option value="3">3 ימים</option>
+                            <option value="4">4 ימים</option>
+                            <option value="5">5 ימים</option>
+                            <option value="6">6 ימים</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Measured Length Input -->
+                <div>
+                    <label for="measuredLength" class="block text-sm font-semibold text-slate-700 mb-2">אורך נמדד (במילימטרים - mm):</label>
+                    <input type="number" step="0.1" id="measuredLength" placeholder="לדוגמה: 45.2" required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition duration-200">
+                    חשב אחוזון
                 </button>
-            </div>
+            </form>
 
-            <!-- Primary Calculated Metrics (Shown when measurement is entered) -->
-            <div id="measuredOutcomeBox" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Results Section (Hidden by default) -->
+            <div id="resultsCard" class="hidden mt-8 pt-6 border-t border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">תוצאות החישוב</h3>
                 
-                <!-- Percentile Card -->
-                <div id="percentileCard" class="rounded-2xl p-5 border-2 bg-[#CCEBC5]/30 border-[#CCEBC5] flex flex-col items-center justify-center text-center">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">אחוזון מחושב (Percentile)</span>
-                    <div class="text-4xl font-extrabold text-[#2D3748] font-mono my-1" id="percentileValue" dir="ltr">50.0%</div>
-                    <span id="clinicalStatusBadge" class="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-[#CCEBC5] text-[#2D3748]">
-                        בטווח הנורמה (10–90)
-                    </span>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 text-center mb-6">
+                    <span class="text-sm font-medium text-indigo-700 block mb-1">האחוזון המחושב לעצם הנבחרת:</span>
+                    <span id="resultPercentile" class="text-3xl font-extrabold text-indigo-900">-</span>
+                    <span id="zScoreDisplay" class="text-xs text-indigo-600 block mt-1"></span>
                 </div>
 
-                <!-- Z-Score Card -->
-                <div class="rounded-2xl p-5 border-2 bg-[#B3CDE3]/25 border-[#B3CDE3] flex flex-col items-center justify-center text-center">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">ציון תקן (Z-Score / SD)</span>
-                    <div class="text-3xl font-extrabold text-[#2D3748] font-mono my-1" id="zScoreValue" dir="ltr">0.00 SD</div>
-                    <span class="text-xs text-slate-600 mt-1" id="sdExplanation">
-                        סטיית תקן לשבוע זה: <strong id="currentSdInline" class="font-mono">2.2</strong> מ"מ
-                    </span>
-                </div>
-
-                <!-- Measured vs Median Comparison Card -->
-                <div class="rounded-2xl p-5 border-2 bg-[#DECBE4]/25 border-[#DECBE4] flex flex-col items-center justify-center text-center">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">השוואה לחציון (50th)</span>
-                    <div class="text-2xl font-extrabold text-[#2D3748] font-mono my-1" id="diffValue" dir="ltr">0.0 mm</div>
-                    <span class="text-xs text-slate-600 mt-1" id="measuredEcho">
-                        נמדד: <strong class="font-mono">-</strong> | חציון: <strong class="font-mono">-</strong>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Visual Percentile Bar / Gauge -->
-            <div id="gaugeContainer" class="hidden bg-[#F8F9FA] rounded-2xl p-5 border border-slate-200">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs font-bold text-[#2D3748]">סרגל מיקום ויזואלי לאורך התפלגות האחוזונים:</span>
-                    <span id="gaugeLabel" class="text-xs font-semibold text-slate-600 font-mono" dir="ltr"></span>
-                </div>
-                
-                <!-- Bar Track (RTL: right is 0%, left is 100%) -->
-                <div class="relative h-7 w-full rounded-full overflow-hidden flex border border-slate-300 shadow-inner">
-                    <!-- 0 to 3rd: <3% Coral/Red -->
-                    <div class="h-full bg-rose-200 border-l border-white/60" style="width: 10%;" title="מתחת לאחוזון 3"></div>
-                    <!-- 3rd to 10th: Amber/Yellow -->
-                    <div class="h-full bg-amber-100 border-l border-white/60" style="width: 12%;" title="אחוזון 3 עד 10"></div>
-                    <!-- 10th to 90th: Pastel Green (#CCEBC5) -->
-                    <div class="h-full bg-[#CCEBC5] border-l border-white/60 relative" style="width: 56%;" title="טווח תקין: אחוזון 10 עד 90">
-                        <!-- 50th center dashed line -->
-                        <div class="absolute inset-y-0 right-1/2 w-0.5 bg-[#2D3748]/40"></div>
+                <h4 class="text-sm font-semibold text-slate-700 mb-3">ערכי הייחוס (Centiles) לשבוע זה:</h4>
+                <div class="grid grid-cols-3 md:grid-cols-5 gap-3 text-center">
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <span class="text-xs text-slate-500 block">אחוזון 3</span>
+                        <span id="c3" class="font-bold text-slate-800 text-base">-</span>
                     </div>
-                    <!-- 90th to 97th: Amber/Yellow -->
-                    <div class="h-full bg-amber-100 border-l border-white/60" style="width: 12%;" title="אחוזון 90 עד 97"></div>
-                    <!-- >97th: Coral/Red -->
-                    <div class="h-full bg-rose-200" style="width: 10%;" title="מעל אחוזון 97"></div>
-                </div>
-
-                <!-- Pointer Marker Track -->
-                <div class="relative h-6 w-full mt-1">
-                    <div id="gaugeMarker" class="absolute top-0 -translate-x-1/2 flex flex-col items-center" style="right: 50%;">
-                        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-[#2D3748]"></div>
-                        <span id="gaugeMarkerText" class="text-[11px] font-extrabold bg-[#2D3748] text-white px-2 py-0.5 rounded shadow font-mono whitespace-nowrap" dir="ltr">
-                            50%
-                        </span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <span class="text-xs text-slate-500 block">אחוזון 10</span>
+                        <span id="c10" class="font-bold text-slate-800 text-base">-</span>
                     </div>
-                </div>
-
-                <!-- Scale Tick Labels -->
-                <div class="relative w-full h-5 text-[11px] font-mono font-semibold text-slate-500 mt-2">
-                    <span class="absolute right-0">0%</span>
-                    <span class="absolute right-[10%] translate-x-1/2 text-rose-700">3rd</span>
-                    <span class="absolute right-[22%] translate-x-1/2 text-amber-700">10th</span>
-                    <span class="absolute right-[50%] translate-x-1/2 text-[#2D3748] font-bold">50th</span>
-                    <span class="absolute right-[78%] translate-x-1/2 text-amber-700">90th</span>
-                    <span class="absolute right-[90%] translate-x-1/2 text-rose-700">97th</span>
-                    <span class="absolute left-0">100%</span>
-                </div>
-            </div>
-
-            <!-- Reference Centiles Table for Current Gestational Age -->
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-bold text-[#2D3748] flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#B3CDE3] inline-block"></span>
-                        <span>ערכי ייחוס צפויים לשבוע הנבחר (במילימטרים - mm):</span>
-                    </h3>
-                    <span id="exactGaBadge" class="text-xs font-mono bg-[#F8F9FA] px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600" dir="ltr">
-                        w = 20.00
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 text-center">
-                    <div class="bg-rose-50/60 border border-rose-200/80 rounded-xl p-3">
-                        <span class="text-xs font-semibold text-rose-800 block">אחוזון 3 (3rd)</span>
-                        <span id="ref3" class="font-mono font-bold text-lg text-[#2D3748] mt-1 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-400 font-mono block" dir="ltr">-1.88 SD</span>
+                    <div class="bg-indigo-50/50 border border-indigo-200 rounded-xl p-3">
+                        <span class="text-xs text-indigo-600 block font-medium">אחוזון 50</span>
+                        <span id="c50" class="font-bold text-indigo-900 text-base">-</span>
                     </div>
-                    <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3">
-                        <span class="text-xs font-semibold text-amber-800 block">אחוזון 10 (10th)</span>
-                        <span id="ref10" class="font-mono font-bold text-lg text-[#2D3748] mt-1 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-400 font-mono block" dir="ltr">-1.28 SD</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <span class="text-xs text-slate-500 block">אחוזון 90</span>
+                        <span id="c90" class="font-bold text-slate-800 text-base">-</span>
                     </div>
-                    <div class="bg-[#CCEBC5]/40 border-2 border-[#CCEBC5] rounded-xl p-3">
-                        <span class="text-xs font-bold text-[#2D3748] block">אחוזון 50 (חציון)</span>
-                        <span id="ref50" class="font-mono font-extrabold text-xl text-[#2D3748] mt-0.5 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-500 font-mono block" dir="ltr">Mean (0 SD)</span>
-                    </div>
-                    <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3">
-                        <span class="text-xs font-semibold text-amber-800 block">אחוזון 90 (90th)</span>
-                        <span id="ref90" class="font-mono font-bold text-lg text-[#2D3748] mt-1 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-400 font-mono block" dir="ltr">+1.28 SD</span>
-                    </div>
-                    <div class="bg-rose-50/60 border border-rose-200/80 rounded-xl p-3">
-                        <span class="text-xs font-semibold text-rose-800 block">אחוזון 97 (97th)</span>
-                        <span id="ref97" class="font-mono font-bold text-lg text-[#2D3748] mt-1 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-400 font-mono block" dir="ltr">+1.88 SD</span>
-                    </div>
-                    <div class="bg-[#B3CDE3]/25 border border-[#B3CDE3] rounded-xl p-3">
-                        <span class="text-xs font-semibold text-[#2D3748] block">סטיית תקן (SD)</span>
-                        <span id="refSd" class="font-mono font-bold text-lg text-[#2D3748] mt-1 block" dir="ltr">-</span>
-                        <span class="text-[10px] text-slate-500 font-mono block" dir="ltr">±1 SD (mm)</span>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 col-span-3 md:col-span-1">
+                        <span class="text-xs text-slate-500 block">אחוזון 97</span>
+                        <span id="c97" class="font-bold text-slate-800 text-base">-</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Active Formula Display Box -->
-            <div class="bg-[#F8F9FA] rounded-xl p-3.5 border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-500">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded bg-[#DECBE4]/60 text-[#2D3748] font-bold">משוואת רגרסיה</span>
-                    <span id="formulaBoneLabel" class="font-semibold text-[#2D3748]">עצם הירך (Femur):</span>
-                </div>
-                <div id="formulaText" class="font-mono text-[11px] text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 w-full sm:w-auto text-left" dir="ltr">
-                    Mean = 3.4162w - 0.0004791w³ - 32.425
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Quick All-Bones Reference Expander for Current Gestational Age -->
-        <section class="bg-white rounded-2xl card-shadow border border-slate-200/80 overflow-hidden">
-            <button type="button" id="toggleAllBonesBtn" class="w-full px-5 py-4 text-right flex items-center justify-between bg-[#F8F9FA] hover:bg-[#B3CDE3]/20 transition">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#DECBE4] inline-block"></span>
-                    <span class="font-bold text-sm md:text-base text-[#2D3748]">
-                        טבלת השוואה מהירה לכל 7 העצמות בשבוע הריון הנבחר (<span id="tableGaLabel">20+0</span>)
-                    </span>
-                </div>
-                <svg id="expanderIcon" class="w-5 h-5 text-slate-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
-            <div id="allBonesTableContainer" class="hidden p-4 md:p-6 border-t border-slate-200 overflow-x-auto">
-                <table class="w-full text-sm text-right border-collapse">
-                    <thead>
-                        <tr class="bg-[#B3CDE3]/30 text-[#2D3748] border-b border-[#B3CDE3]">
-                            <th class="py-2.5 px-3 font-bold rounded-tr-lg">עצם (Bone)</th>
-                            <th class="py-2.5 px-3 font-bold text-center" dir="ltr">3rd (mm)</th>
-                            <th class="py-2.5 px-3 font-bold text-center" dir="ltr">10th (mm)</th>
-                            <th class="py-2.5 px-3 font-bold text-center bg-[#CCEBC5]/40" dir="ltr">50th (mm)</th>
-                            <th class="py-2.5 px-3 font-bold text-center" dir="ltr">90th (mm)</th>
-                            <th class="py-2.5 px-3 font-bold text-center" dir="ltr">97th (mm)</th>
-                            <th class="py-2.5 px-3 font-bold text-center rounded-tl-lg" dir="ltr">SD</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allBonesTbody" class="divide-y divide-slate-100 font-mono text-xs md:text-sm">
-                        <!-- Dynamically populated -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
+        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-5 px-4 text-center text-xs text-slate-500 mt-8">
-        <div class="max-w-3xl mx-auto space-y-1">
-            <p class="font-semibold text-[#2D3748]">
-                מחשבון עזר קליני לאולטרסאונד מיילדותי | Chitty LS, Altman DG (BJOG 2002; 109: 919–929)
-            </p>
-            <p>
-                כל הלוגריתמים מחושבים לפי בסיס 10 ($\log_{10}$) בהתאם למשוואות הרגרסיה בנספח המחקר המקורי.
-            </p>
-        </div>
+    <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200">
+        מבוסס על משוואות הרגרסיה של Chitty et al. (BJOG 2002) | לשימוש לימודי וקליני עזר בלבד.
     </footer>
 
-    <!-- Application Logic -->
+    <!-- JavaScript Calculation Engine -->
     <script>
-        // Bone metadata and exact Chitty & Altman (2002) regression equations
-        // IMPORTANT: Chitty & Altman use base-10 logarithm (Math.log10)
-        const BONE_MODELS = {
-            femur: {
-                nameHe: 'עצם הירך',
-                nameEn: 'Femur',
-                fullName: 'עצם הירך (Femur)',
-                formulaStr: 'Mean = 3.4162w - 0.0004791w³ - 32.425 | SD = 0.058328w + 1.0605',
-                calc: function(w) {
-                    const mean = 3.4162 * w - 0.0004791 * Math.pow(w, 3) - 32.425;
-                    const sd = 0.058328 * w + 1.0605;
-                    return { mean, sd };
-                }
-            },
-            humerus: {
-                nameHe: 'עצם הזרוע',
-                nameEn: 'Humerus',
-                fullName: 'עצם הזרוע (Humerus)',
-                formulaStr: 'Mean = 11.459w - 2.2362w·log₁₀(w) - 63.704 | SD = 0.040292w + 1.3464',
-                calc: function(w) {
-                    const mean = 11.459 * w - 2.2362 * w * Math.log10(w) - 63.704;
-                    const sd = 0.040292 * w + 1.3464;
-                    return { mean, sd };
-                }
-            },
-            tibia: {
-                nameHe: 'עצם השוקה',
-                nameEn: 'Tibia',
-                fullName: 'עצם השוקה (Tibia)',
-                formulaStr: 'Mean = 14451/w² - 2553.2/w + 120.05 | SD = 0.049978w + 1.1102',
-                calc: function(w) {
-                    const mean = (14451.0 / (w * w)) - (2553.2 / w) + 120.05;
-                    const sd = 0.049978 * w + 1.1102;
-                    return { mean, sd };
-                }
-            },
-            fibula: {
-                nameHe: 'עצם השוקית',
-                nameEn: 'Fibula',
-                fullName: 'עצם השוקית (Fibula)',
-                formulaStr: 'Mean = 13697/w² - 2458.0/w + 116.51 | SD = 0.053841w + 1.0451',
-                calc: function(w) {
-                    const mean = (13697.0 / (w * w)) - (2458.0 / w) + 116.51;
-                    const sd = 0.053841 * w + 1.0451;
-                    return { mean, sd };
-                }
-            },
-            radius: {
-                nameHe: 'עצם החישור',
-                nameEn: 'Radius',
-                fullName: 'עצם החישור (Radius)',
-                formulaStr: 'Mean = 7983/w² - 1698.6/w + 91.634 | SD = 0.046386w + 1.1933',
-                calc: function(w) {
-                    const mean = (7983.0 / (w * w)) - (1698.6 / w) + 91.634;
-                    const sd = 0.046386 * w + 1.1933;
-                    return { mean, sd };
-                }
-            },
-            ulna: {
-                nameHe: 'עצם הגומד',
-                nameEn: 'Ulna',
-                fullName: 'עצם הגומד (Ulna)',
-                formulaStr: 'Mean = 11120/w² - 2146.3/w + 108.94 | SD = 0.049218w + 1.2021',
-                calc: function(w) {
-                    const mean = (11120.0 / (w * w)) - (2146.3 / w) + 108.94;
-                    const sd = 0.049218 * w + 1.2021;
-                    return { mean, sd };
-                }
-            },
-            foot: {
-                nameHe: 'אורך כף הרגל',
-                nameEn: 'Foot',
-                fullName: 'אורך כף הרגל (Foot)',
-                formulaStr: 'Mean = 0.36909w + 0.084175w²·log₁₀(w) - 14.158 | SD = 0.10865w + 0.27971',
-                calc: function(w) {
-                    const mean = 0.36909 * w + 0.084175 * (w * w) * Math.log10(w) - 14.158;
-                    const sd = 0.10865 * w + 0.27971;
-                    return { mean, sd };
-                }
-            }
-        };
-
-        // Z-multipliers for standard centiles
-        const Z_3RD = -1.88079;
-        const Z_10TH = -1.28155;
-        const Z_90TH = 1.28155;
-        const Z_97TH = 1.88079;
-
-        // DOM Elements
-        const boneSelect = document.getElementById('boneType');
+        // Populate weeks dropdown from 12 to 42
         const weeksSelect = document.getElementById('weeks');
-        const daysSelect = document.getElementById('days');
-        const measuredInput = document.getElementById('measuredLength');
-        const calcForm = document.getElementById('calcForm');
-        const resetBtn = document.getElementById('resetBtn');
-        const errorBox = document.getElementById('errorBox');
-        const copyBtn = document.getElementById('copyBtn');
-        const copyBtnText = document.getElementById('copyBtnText');
-
-        // Populate Weeks (12 to 42)
         for (let w = 12; w <= 42; w++) {
-            const opt = document.createElement('option');
-            opt.value = w;
-            opt.textContent = `שבוע ${w}`;
-            if (w === 20) opt.selected = true;
-            weeksSelect.appendChild(opt);
+            const option = document.createElement('option');
+            option.value = w;
+            option.textContent = `שבוע ${w}`;
+            if (w === 20) option.selected = true; // Default to week 20
+            weeksSelect.appendChild(option);
         }
 
-        // Standard Normal Cumulative Distribution Function (CDF)
+        // Standard Normal Cumulative Distribution Function (CDF) approximation
         function normalCDF(z) {
-            return 0.5 * (1 + erf(z / Math.SQRT2));
+            return 0.5 * (1 + erf(z / Math.sqrt(2)));
         }
 
-        // Error Function Approximation (Abramowitz & Stegun 7.1.26)
+        // Error function approximation (Abramowitz and Stegun)
         function erf(x) {
             const sign = (x >= 0) ? 1 : -1;
             x = Math.abs(x);
@@ -523,229 +149,91 @@
             return sign * y;
         }
 
-        // Map percentile (0-100) to visual piecewise gauge position (0-100%)
-        // Track segments: [0-3% -> 0-10%], [3-10% -> 10-22%], [10-90% -> 22-78%], [90-97% -> 78-90%], [97-100% -> 90-100%]
-        function mapPercentileToGaugePosition(p) {
-            const clamped = Math.max(0.1, Math.min(99.9, p));
-            if (clamped <= 3) {
-                return (clamped / 3) * 10;
-            } else if (clamped <= 10) {
-                return 10 + ((clamped - 3) / 7) * 12;
-            } else if (clamped <= 90) {
-                return 22 + ((clamped - 10) / 80) * 56;
-            } else if (clamped <= 97) {
-                return 78 + ((clamped - 90) / 7) * 12;
-            } else {
-                return 90 + ((clamped - 97) / 3) * 10;
+        // Calculation formulas based on Chitty et al. Appendix equations
+        function calculateBoneMetrics(bone, w) {
+            let mean, sd;
+            const logw = Math.log10(w);
+
+            switch (bone) {
+                case 'humerus':
+                    mean = 11.459 * w - 2.2362 * w * logw - 63.704;
+                    sd = 0.040292 * w + 1.3464;
+                    break;
+                case 'radius':
+                    mean = (7983.0 / Math.pow(w, 2)) - (1698.6 / w) + 91.634;
+                    sd = 0.046386 * w + 1.1933;
+                    break;
+                case 'ulna':
+                    mean = (11120.0 / Math.pow(w, 2)) - (2146.3 / w) + 108.94;
+                    sd = 0.049218 * w + 1.2021;
+                    break;
+                case 'femur':
+                    mean = 3.4162 * w - 0.0004791 * Math.pow(w, 3) - 32.425;
+                    sd = 0.058328 * w + 1.0605;
+                    break;
+                case 'tibia':
+                    mean = (14451.0 / Math.pow(w, 2)) - (2553.2 / w) + 120.05;
+                    sd = 0.049978 * w + 1.1102;
+                    break;
+                case 'fibula':
+                    mean = (13697.0 / Math.pow(w, 2)) - (2458.0 / w) + 116.51;
+                    sd = 0.053841 * w + 1.0451;
+                    break;
+                case 'foot':
+                    mean = -0.36909 * w + 0.084175 * Math.pow(w, 2) * logw + 14.158;
+                    sd = 0.10865 * w + 0.27971;
+                    break;
+                default:
+                    mean = 0; sd = 1;
             }
+            return { mean, sd };
         }
 
-        // Update reference centiles and all-bones table whenever GA or bone changes
-        function updateReferenceDisplay() {
-            const boneKey = boneSelect.value;
-            const weeks = parseInt(weeksSelect.value, 10);
-            const days = parseInt(daysSelect.value, 10);
-            const w = weeks + (days / 7.0);
-
-            const boneObj = BONE_MODELS[boneKey];
-            const { mean, sd } = boneObj.calc(w);
-
-            const c3 = mean + Z_3RD * sd;
-            const c10 = mean + Z_10TH * sd;
-            const c50 = mean;
-            const c90 = mean + Z_90TH * sd;
-            const c97 = mean + Z_97TH * sd;
-
-            // Update Reference Cards
-            document.getElementById('ref3').textContent = `${c3.toFixed(1)}`;
-            document.getElementById('ref10').textContent = `${c10.toFixed(1)}`;
-            document.getElementById('ref50').textContent = `${c50.toFixed(1)}`;
-            document.getElementById('ref90').textContent = `${c90.toFixed(1)}`;
-            document.getElementById('ref97').textContent = `${c97.toFixed(1)}`;
-            document.getElementById('refSd').textContent = `${sd.toFixed(1)}`;
-
-            // Update Headers & Formula Info
-            document.getElementById('resultTitle').textContent = `${boneObj.fullName} — שבוע ${weeks}+${days}`;
-            document.getElementById('exactGaBadge').textContent = `GA = ${weeks}w+${days}d (${w.toFixed(2)}w)`;
-            document.getElementById('formulaBoneLabel').textContent = `${boneObj.fullName}:`;
-            document.getElementById('formulaText').textContent = boneObj.formulaStr;
-            document.getElementById('tableGaLabel').textContent = `${weeks}+${days}`;
-
-            // Update All-Bones Comparison Table
-            const tbody = document.getElementById('allBonesTbody');
-            tbody.innerHTML = '';
-            Object.keys(BONE_MODELS).forEach(key => {
-                const b = BONE_MODELS[key];
-                const m = b.calc(w);
-                const isSelected = (key === boneKey);
-                const tr = document.createElement('tr');
-                tr.className = isSelected ? 'bg-[#B3CDE3]/25 font-bold text-[#2D3748]' : 'hover:bg-slate-50 text-slate-700';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-sans font-semibold">${b.fullName}</td>
-                    <td class="py-2.5 px-3 text-center" dir="ltr">${(m.mean + Z_3RD * m.sd).toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-center" dir="ltr">${(m.mean + Z_10TH * m.sd).toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-center font-bold bg-[#CCEBC5]/25" dir="ltr">${m.mean.toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-center" dir="ltr">${(m.mean + Z_90TH * m.sd).toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-center" dir="ltr">${(m.mean + Z_97TH * m.sd).toFixed(1)}</td>
-                    <td class="py-2.5 px-3 text-center text-slate-500" dir="ltr">${m.sd.toFixed(1)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // If user already typed a valid measurement, automatically recalculate
-            const rawVal = measuredInput.value.trim();
-            if (rawVal !== '' && !isNaN(parseFloat(rawVal)) && parseFloat(rawVal) > 0) {
-                evaluateMeasurement(parseFloat(rawVal), boneObj, weeks, days, w, mean, sd);
-            } else {
-                document.getElementById('measuredOutcomeBox').classList.add('hidden');
-                document.getElementById('gaugeContainer').classList.add('hidden');
-                copyBtn.classList.add('hidden');
-                document.getElementById('resultSubtitle').textContent = 'מוצגים ערכי הייחוס לשבוע הנבחר. הזן אורך נמדד לחישוב אחוזון מדויק.';
-            }
-        }
-
-        // Core calculation for a specific measured length
-        function evaluateMeasurement(measured, boneObj, weeks, days, w, mean, sd) {
-            errorBox.classList.add('hidden');
-
-            const z = (measured - mean) / sd;
-            const percentile = normalCDF(z) * 100;
-            const diff = measured - mean;
-
-            // Format Percentile Text
-            let pctFormatted;
-            if (percentile < 0.1) {
-                pctFormatted = '< 0.1%';
-            } else if (percentile > 99.9) {
-                pctFormatted = '> 99.9%';
-            } else {
-                pctFormatted = `${percentile.toFixed(1)}%`;
-            }
-
-            // Format Z-Score & Diff
-            const zFormatted = `${z >= 0 ? '+' : ''}${z.toFixed(2)} SD`;
-            const diffFormatted = `${diff >= 0 ? '+' : ''}${diff.toFixed(1)} mm`;
-
-            // Update DOM Values
-            document.getElementById('percentileValue').textContent = pctFormatted;
-            document.getElementById('zScoreValue').textContent = zFormatted;
-            document.getElementById('currentSdInline').textContent = sd.toFixed(2);
-            document.getElementById('diffValue').textContent = diffFormatted;
-            document.getElementById('measuredEcho').innerHTML = `נמדד: <strong class="font-mono">${measured.toFixed(1)}</strong> מ"מ | חציון: <strong class="font-mono">${mean.toFixed(1)}</strong> מ"מ`;
-            document.getElementById('resultSubtitle').textContent = `חישוב עבור מדידה של ${measured.toFixed(1)} מ"מ בשבוע ${weeks}+${days}`;
-
-            // Styling based on clinical zone
-            const pCard = document.getElementById('percentileCard');
-            const badge = document.getElementById('clinicalStatusBadge');
-
-            if (percentile < 3) {
-                pCard.className = 'rounded-2xl p-5 border-2 bg-rose-50 border-rose-300 flex flex-col items-center justify-center text-center';
-                badge.className = 'inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-rose-200 text-rose-900';
-                badge.textContent = 'מתחת לאחוזון 3 (<3rd Centile)';
-            } else if (percentile < 10) {
-                pCard.className = 'rounded-2xl p-5 border-2 bg-amber-50 border-amber-300 flex flex-col items-center justify-center text-center';
-                badge.className = 'inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-amber-200 text-amber-900';
-                badge.textContent = 'אחוזון גבולי נמוך (3rd–10th)';
-            } else if (percentile <= 90) {
-                pCard.className = 'rounded-2xl p-5 border-2 bg-[#CCEBC5]/35 border-[#CCEBC5] flex flex-col items-center justify-center text-center';
-                badge.className = 'inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-[#CCEBC5] text-[#2D3748]';
-                badge.textContent = 'בטווח הנורמה (10th–90th)';
-            } else if (percentile <= 97) {
-                pCard.className = 'rounded-2xl p-5 border-2 bg-amber-50 border-amber-300 flex flex-col items-center justify-center text-center';
-                badge.className = 'inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-amber-200 text-amber-900';
-                badge.textContent = 'אחוזון גבולי גבוה (90th–97th)';
-            } else {
-                pCard.className = 'rounded-2xl p-5 border-2 bg-rose-50 border-rose-300 flex flex-col items-center justify-center text-center';
-                badge.className = 'inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold bg-rose-200 text-rose-900';
-                badge.textContent = 'מעל אחוזון 97 (>97th Centile)';
-            }
-
-            // Update Visual Gauge
-            const pos = mapPercentileToGaugePosition(percentile);
-            document.getElementById('gaugeMarker').style.right = `${pos}%`;
-            document.getElementById('gaugeMarkerText').textContent = `${measured.toFixed(1)}mm (${pctFormatted})`;
-            document.getElementById('gaugeLabel').textContent = `Z = ${z >= 0 ? '+' : ''}${z.toFixed(2)}`;
-
-            // Reveal Outcome Boxes
-            document.getElementById('measuredOutcomeBox').classList.remove('hidden');
-            document.getElementById('gaugeContainer').classList.remove('hidden');
-            copyBtn.classList.remove('hidden');
-
-            // Store summary text for clinical clipboard copy
-            copyBtn.dataset.summary = `${boneObj.fullName} בשבוע ${weeks}+${days}: נמדד ${measured.toFixed(1)} מ"מ — אחוזון ${pctFormatted} (Z-score: ${zFormatted}, חציון: ${mean.toFixed(1)} מ"מ, טווח 3%-97%: ${(mean + Z_3RD * sd).toFixed(1)}-${(mean + Z_97TH * sd).toFixed(1)} מ"מ לפי Chitty & Altman 2002).`;
-        }
-
-        // Form Submit Handler
-        calcForm.addEventListener('submit', function(e) {
+        // Form submission and calculation trigger
+        document.getElementById('calcForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const rawVal = measuredInput.value.trim();
-            const measured = parseFloat(rawVal);
 
-            if (rawVal === '' || isNaN(measured) || measured <= 0 || measured > 150) {
-                errorBox.classList.remove('hidden');
+            const bone = document.getElementById('boneType').value;
+            const weeks = parseInt(document.getElementById('weeks').value);
+            const days = parseInt(document.getElementById('days').value);
+            const measured = parseFloat(document.getElementById('measuredLength').value);
+
+            if (isNaN(measured) || measured <= 0) {
+                alert('נא להזין אורך תקין במילימטרים.');
                 return;
             }
 
-            const boneKey = boneSelect.value;
-            const weeks = parseInt(weeksSelect.value, 10);
-            const days = parseInt(daysSelect.value, 10);
+            // Exact gestational age in fractional weeks
             const w = weeks + (days / 7.0);
-            const boneObj = BONE_MODELS[boneKey];
-            const { mean, sd } = boneObj.calc(w);
 
-            evaluateMeasurement(measured, boneObj, weeks, days, w, mean, sd);
+            // Compute Mean and SD
+            const { mean, sd } = calculateBoneMetrics(bone, w);
+
+            // Compute Z-score and percentile
+            const z = (measured - mean) / sd;
+            const percentile = normalCDF(z) * 100;
+
+            // Compute specific centiles (Z values for 3rd, 10th, 50th, 90th, 97th)
+            const c3 = mean + (-1.88079) * sd;
+            const c10 = mean + (-1.28155) * sd;
+            const c50 = mean;
+            const c90 = mean + (1.28155) * sd;
+            const c97 = mean + (1.88079) * sd;
+
+            // Display results
+            document.getElementById('resultPercentile').textContent = `${percentile.toFixed(1)}%`;
+            document.getElementById('zScoreDisplay').textContent = `ציון תקן (Z-score): ${z.toFixed(2)}`;
+
+            document.getElementById('c3').textContent = `${c3.toFixed(1)} mm`;
+            document.getElementById('c10').textContent = `${c10.toFixed(1)} mm`;
+            document.getElementById('c50').textContent = `${c50.toFixed(1)} mm`;
+            document.getElementById('c90').textContent = `${c90.toFixed(1)} mm`;
+            document.getElementById('c97').textContent = `${c97.toFixed(1)} mm`;
+
+            // Reveal results section
+            document.getElementById('resultsCard').classList.remove('hidden');
+            document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
         });
-
-        // Live updates on dropdown or input change
-        boneSelect.addEventListener('change', updateReferenceDisplay);
-        weeksSelect.addEventListener('change', updateReferenceDisplay);
-        daysSelect.addEventListener('change', updateReferenceDisplay);
-        measuredInput.addEventListener('input', function() {
-            errorBox.classList.add('hidden');
-            updateReferenceDisplay();
-        });
-
-        // Reset Button
-        resetBtn.addEventListener('click', function() {
-            measuredInput.value = '';
-            errorBox.classList.add('hidden');
-            updateReferenceDisplay();
-            measuredInput.focus();
-        });
-
-        // Copy Clinical Summary Button (Using execCommand fallback for maximum compatibility)
-        copyBtn.addEventListener('click', function() {
-            const textToCopy = copyBtn.dataset.summary || '';
-            if (!textToCopy) return;
-
-            const tempArea = document.createElement('textarea');
-            tempArea.value = textToCopy;
-            tempArea.style.position = 'fixed';
-            tempArea.style.opacity = '0';
-            document.body.appendChild(tempArea);
-            tempArea.select();
-            try {
-                document.execCommand('copy');
-                copyBtnText.textContent = 'הועתק ללוח!';
-                setTimeout(() => {
-                    copyBtnText.textContent = 'העתק סיכום לתיק רפואי';
-                }, 2000);
-            } catch (err) {
-                copyBtnText.textContent = 'שגיאה בהעתקה';
-            }
-            document.body.removeChild(tempArea);
-        });
-
-        // Toggle All-Bones Comparison Table
-        document.getElementById('toggleAllBonesBtn').addEventListener('click', function() {
-            const container = document.getElementById('allBonesTableContainer');
-            const icon = document.getElementById('expanderIcon');
-            container.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
-        });
-
-        // Initial render on load
-        window.addEventListener('DOMContentLoaded', updateReferenceDisplay);
     </script>
 </body>
 </html>
